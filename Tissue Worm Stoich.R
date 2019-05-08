@@ -52,29 +52,32 @@ Total_N = run[,"N"] + run[,"A"]*run[,"QA"] + run[,"H"]*run[,"QH"] + run[,"P"]*ru
 var(Total_N)
 plot(run[,"time"], Total_N, typ="l")
 
-# 
-# N.out = numeric()
-# A.out = numeric()
-# QA.out = numeric()
-# H.out = numeric()
-# QH.out = numeric()
-# P.out = numeric()
-# 
-# ns = seq(from=0.0001, to=0.2, length.out = 100)
-# for (n in 0:100){
-#   inits["N"] = n
-#   output = lsoda(y = inits, times=0:100000, parms = params, func=Worm_stoich)
-#   N.out[n] = output[100001, 2]
-#   A.out[n] = output[100001, 3]
-#   QA.out[n] = output[100001, 4]
-#   H.out[n] = output[100001, 5]
-#   QH.out[n] = output[100001, 6]
-#   P.out[n] = output[100001, 7]
-# }
-# par(mfrow=c(2, 3))
-# plot(1:100, N.out, typ="l")
-# plot(1:100, A.out, typ="l")
-# plot(1:100, QA.out, typ="l")
-# plot(1:100, H.out, typ="l")
-# plot(1:100, QH.out, typ="l")
-# plot(1:100, P.out, typ="l")
+
+N.out = numeric()
+A.out = numeric()
+QA.out = numeric()
+H.out = numeric()
+QH.out = numeric()
+P.out = numeric()
+QP.out =  numeric()
+
+ns = seq(from=0.0001, to=0.2, length.out = 100)
+for (n in 1:20){
+  inits["N"] = n
+  output = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich)
+  N.out[n] = mean(output[1001:2001, 2])
+  A.out[n] = mean(output[1001:2001, 3])
+  QA.out[n] = mean(output[1001:2001, 4])
+  H.out[n] = mean(output[1001:2001, 5])
+  QH.out[n] = mean(output[1001:2001, 6])
+  P.out[n] = mean(output[1001:2001, 7])
+  QP.out[n] = mean(output[1001:2001, 8])
+}
+par(mfrow=c(3, 3))
+plot(1:20, N.out, typ="l")
+plot(1:20, A.out, typ="l")
+plot(1:20, QA.out, typ="l")
+plot(1:20, H.out, typ="l")
+plot(1:20, QH.out, typ="l")
+plot(1:20, P.out, typ="l")
+plot(1:20, QP.out, typ="l")
