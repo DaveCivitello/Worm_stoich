@@ -63,7 +63,7 @@ QP.out =  numeric()
 
 ns = seq(from=0.0001, to=0.2, length.out = 100)
 for (n in 1:20){
-  inits["N"] = n
+  inits["N"] = n/4
   output = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich)
   N.out[n] = mean(output[1001:2001, 2])
   A.out[n] = mean(output[1001:2001, 3])
@@ -81,3 +81,47 @@ plot(1:20, H.out, typ="l")
 plot(1:20, QH.out, typ="l")
 plot(1:20, P.out, typ="l")
 plot(1:20, QP.out, typ="l")
+
+run.dt = data.frame( "N" = rep((1:20)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=20))
+
+N.out = numeric()
+A.out = numeric()
+QA.out = numeric()
+H.out = numeric()
+QH.out = numeric()
+P.out = numeric()
+QP.out =  numeric()
+
+ns = seq(from=0.0001, to=0.2, length.out = 100)
+for (n in 1:20){
+  inits["N"] = n/4
+  params["f_p"] = 0
+  output = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich)
+  N.out[n] = mean(output[1001:2001, 2])
+  A.out[n] = mean(output[1001:2001, 3])
+  QA.out[n] = mean(output[1001:2001, 4])
+  H.out[n] = mean(output[1001:2001, 5])
+  QH.out[n] = mean(output[1001:2001, 6])
+  P.out[n] = mean(output[1001:2001, 7])
+  QP.out[n] = mean(output[1001:2001, 8])
+}
+par(mfrow=c(3, 3))
+plot(1:20, N.out, typ="l")
+plot(1:20, A.out, typ="l")
+plot(1:20, QA.out, typ="l")
+plot(1:20, H.out, typ="l")
+plot(1:20, QH.out, typ="l")
+plot(1:20, P.out, typ="l")
+plot(1:20, QP.out, typ="l")
+
+run.dt2 = data.frame( "N" = rep((1:20)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=20))
+
+library(ggplot2)
+
+par(mfrow=c(1,2))
+
+fig1 = ggplot(subset(run.dt, Label %in% c("A", "H", "P")), aes(x = N, y = Output, fill = Label)) + geom_area(position = 'stack')
+fig2 = ggplot(subset(run.dt2, Label %in% c("A", "H", "P")), aes(x = N, y = Output, fill = Label)) + geom_area(position = 'stack')
+
+library(cowplot)
+plot_grid(fig1, fig2)
