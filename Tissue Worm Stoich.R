@@ -37,14 +37,14 @@ Worm_stoich<-function (t, y, parameters){
 params = c(# nutrient pars
   s = 0, l=0,
   # autotroph pars
-  v = 1, mu_A=0.1, K=100, hN = 1, QAx = 0.05, QAn = 0.01, dA = 0.001, 
+  v = 1, mu_A=0.1, K=100, hN = 1, QAx = 0.1, QAn = 0.01, dA = 0.001, 
   # Host pars
-  f =0.3, QHx = 0.2, QHn = 0.1, dH = 0.01, hA = 50,
+  f =0.3, QHx = 0.15, QHn = 0.1, dH = 0.02, hA = 50,
   # Parasite pars
-  f_p =1, hH = 10, QPx = 0.25, QPn = 0.20, dP = 0.01, dE = 0.1, sigma=0.9, 
-  alpha = 0.001, k = 10)
+  f_p =2, hH = 2, QPx = 0.2, QPn = 0.17, dP = 0.01, dE = 0.2, sigma=0.8, 
+  alpha = 0.01, k = 10)
 
-inits = c(N = 10, A = 1, QA = 0.02, H = 0.1, QH = 0.15, P = 0.1, QP = 0.22)
+inits = c(N = 5, A = 1, QA = 0.02, H = 0.1, QH = 0.15, P = 0.1, QP = 0.172)
 run = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich, atol=1e-9, rtol=1e-9)
 plot(run)
 
@@ -62,8 +62,8 @@ P.out = numeric()
 QP.out =  numeric()
 
 ns = seq(from=0.0001, to=0.2, length.out = 100)
-for (n in 1:20){
-  inits["N"] = n/4
+for (n in 1:200){
+  inits["N"] = n/40
   output = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich)
   N.out[n] = mean(output[1001:2001, 2])
   A.out[n] = mean(output[1001:2001, 3])
@@ -74,15 +74,15 @@ for (n in 1:20){
   QP.out[n] = mean(output[1001:2001, 8])
 }
 par(mfrow=c(3, 3))
-plot(1:20, N.out, typ="l")
-plot(1:20, A.out, typ="l")
-plot(1:20, QA.out, typ="l")
-plot(1:20, H.out, typ="l")
-plot(1:20, QH.out, typ="l")
-plot(1:20, P.out, typ="l")
-plot(1:20, QP.out, typ="l")
+plot(1:200, N.out, typ="l")
+plot(1:200, A.out, typ="l")
+plot(1:200, QA.out, typ="l")
+plot(1:200, H.out, typ="l")
+plot(1:200, QH.out, typ="l")
+plot(1:200, P.out, typ="l")
+plot(1:200, QP.out, typ="l")
 
-run.dt = data.frame( "N" = rep((1:20)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=20))
+run.dt = data.frame( "N" = rep((1:200)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=200))
 
 N.out = numeric()
 A.out = numeric()
@@ -93,8 +93,8 @@ P.out = numeric()
 QP.out =  numeric()
 
 ns = seq(from=0.0001, to=0.2, length.out = 100)
-for (n in 1:20){
-  inits["N"] = n/4
+for (n in 1:200){
+  inits["N"] = n/40
   params["f_p"] = 0
   output = lsoda(y = inits, times=0:2000, parms = params, func=Worm_stoich)
   N.out[n] = mean(output[1001:2001, 2])
@@ -106,22 +106,81 @@ for (n in 1:20){
   QP.out[n] = mean(output[1001:2001, 8])
 }
 par(mfrow=c(3, 3))
-plot(1:20, N.out, typ="l")
-plot(1:20, A.out, typ="l")
-plot(1:20, QA.out, typ="l")
-plot(1:20, H.out, typ="l")
-plot(1:20, QH.out, typ="l")
-plot(1:20, P.out, typ="l")
-plot(1:20, QP.out, typ="l")
+plot(1:200, N.out, typ="l")
+plot(1:200, A.out, typ="l")
+plot(1:200, QA.out, typ="l")
+plot(1:200, H.out, typ="l")
+plot(1:200, QH.out, typ="l")
+plot(1:200, P.out, typ="l")
+plot(1:200, QP.out, typ="l")
 
-run.dt2 = data.frame( "N" = rep((1:20)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=20))
+run.dt2 = data.frame( "N" = rep((1:200)/4, times=7), "Output" = c(N.out, A.out, QA.out, H.out, QH.out, P.out, QP.out), "Label" = rep(c("N", "A", "QA", "H", "QH", "P", "QP"), each=200))
 
 library(ggplot2)
 
 par(mfrow=c(1,2))
 
-fig1 = ggplot(subset(run.dt, Label %in% c("A", "H", "P")), aes(x = N, y = Output, fill = Label)) + geom_area(position = 'stack')
-fig2 = ggplot(subset(run.dt2, Label %in% c("A", "H", "P")), aes(x = N, y = Output, fill = Label)) + geom_area(position = 'stack')
+fig1 = ggplot(subset(run.dt, Label %in% c("A", "H", "P")),aes(x = N, y = Output, fill = Label)) +
+        theme(plot.margin = unit(c(0, 0, 0, 0), "cm"), legend.position = "None")+
+        scale_y_continuous(limits=c(0,65)) +
+        scale_fill_manual(values=c("dark green", "magenta", "brown")) +
+        geom_area(position = 'stack')
+fig2 = ggplot(subset(run.dt2, Label %in% c("A", "H", "P")), aes(x = N, y = Output, fill = Label)) +
+        theme(plot.margin = unit(c(0, 0, 0, 0), "cm"), legend.position = "None")+
+        scale_y_continuous(limits=c(0,65)) +
+        scale_fill_manual(values=c("dark green", "magenta", "brown")) +
+        geom_area(position = 'stack')
 
 library(cowplot)
+plot_grid(fig1, fig2)
+
+QA_P = as.numeric(unlist(subset(run.dt, Label == "QA", select=Output) - params["QAn"])/(params["QAx"] - params["QAn"]))
+plot(1:200, QA_P, typ="l", col="dark green", lwd=3, ylab="Relative nutrient quota")
+QH_P = as.numeric(unlist(subset(run.dt, Label == "QH", select=Output) - params["QHn"])/(params["QHx"] - params["QHn"]))
+lines(1:200, QH_P, col="brown", lwd=3)
+QP_P = as.numeric(unlist(subset(run.dt, Label == "QP", select=Output) - params["QPn"])/(params["QPx"] - params["QPn"]))
+lines(1:200, QP_P, col="magenta", lwd=3)
+
+QA = as.numeric(unlist(subset(run.dt2, Label == "QA", select=Output) - params["QAn"])/(params["QAx"] - params["QAn"]))
+plot(1:200, QA, typ="l", col="dark green", lwd=3, ylab="Relative nutrient quota")
+QH = as.numeric(unlist(subset(run.dt2, Label == "QH", select=Output) - params["QHn"])/(params["QHx"] - params["QHn"]))
+lines(1:200, QH, col="brown", lwd=3)
+#QP = as.numeric(unlist(subset(run.dt2, Label == "QP", select=Output) - params["QPn"])/(params["QPx"] - params["QPn"]))
+#lines(1:200, QP, col="magenta", lwd=3)
+
+QA_diff = QA_P - QA
+plot(1:200, QA_diff, typ="l", col="dark green", ylim = c(-1, 1), lwd=3, ylab="Effect of parasitism on nutrient quota")
+QH_diff = QH_P - QH
+lines(1:200, QH_diff, typ="l", col="brown", lwd=3)
+abline(h = 0, col="grey", lty=2, lwd=3)
+
+N_A = subset(run.dt2, Label == "QA", select=Output)*subset(run.dt2, Label == "A", select=Output)
+N_H = subset(run.dt2, Label == "QH", select=Output)*subset(run.dt2, Label == "H", select=Output)
+
+N_A_P = as.numeric(unlist(subset(run.dt, Label == "QA", select=Output)*subset(run.dt, Label == "A", select=Output)))
+N_H_P = as.numeric(unlist(subset(run.dt, Label == "QH", select=Output)*subset(run.dt, Label == "H", select=Output)))
+N_P_P = as.numeric(unlist(subset(run.dt, Label == "QP", select=Output)*subset(run.dt, Label == "P", select=Output)))
+
+run_N = data.frame("N" = rep((1:200)/4, times=3), "Output" = c(N_A_P, N_H_P, N_A_P), "Label" = rep(c("A", "H", "P"), each=200))
+
+fig1 = ggplot(run_N,aes(x = N, y = Output, fill = Label)) +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"), legend.position = "None")+
+  scale_y_continuous(limits=c(0,10)) +
+  scale_fill_manual(values=c("dark green", "magenta", "brown")) +
+  geom_area(position = 'stack')
+
+
+
+N_A = as.numeric(unlist(subset(run.dt2, Label == "QA", select=Output)*subset(run.dt2, Label == "A", select=Output)))
+N_H = as.numeric(unlist(subset(run.dt2, Label == "QH", select=Output)*subset(run.dt2, Label == "H", select=Output)))
+N_P = as.numeric(unlist(subset(run.dt2, Label == "QP", select=Output)*subset(run.dt2, Label == "P", select=Output)))
+
+run_N2 = data.frame("N" = rep((1:200)/4, times=3), "Output" = c(N_A, N_H, N_P), "Label" = rep(c("A", "H", "P"), each=200))
+
+fig2 = ggplot(run_N2,aes(x = N, y = Output, fill = Label)) +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "cm"), legend.position = "None")+
+  scale_y_continuous(limits=c(0,10)) +
+  scale_fill_manual(values=c("dark green", "magenta", "brown")) +
+  geom_area(position = 'stack')
+
 plot_grid(fig1, fig2)
